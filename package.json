@@ -1,6 +1,6 @@
 {
   "name": "hls-react-player",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Reusable StreamFlix custom React player component",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

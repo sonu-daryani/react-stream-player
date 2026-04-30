@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "hls-react-player": "^0.2.6"
+    "hls-react-player": "^0.2.7"
   },
   "devDependencies": {
     "vite": "^7.1.10"

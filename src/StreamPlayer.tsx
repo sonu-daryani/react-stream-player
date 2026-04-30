@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import type { StreamPlayerClassNames, StreamPlayerProps } from "./types";
 import "./stream-player.css";
+import { ensureStreamPlayerStyles } from "./ensureStyles";
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(" ");
 
@@ -82,6 +83,10 @@ export default function StreamPlayer({
   const [selectedSubtitle, setSelectedSubtitle] = useState("Off");
   const [selectedAudio, setSelectedAudio] = useState("Default");
   const [selectedResolution, setSelectedResolution] = useState("Auto");
+
+  useEffect(() => {
+    ensureStreamPlayerStyles();
+  }, []);
 
   const safePlay = async (video: HTMLVideoElement) => {
     try {

@@ -147,6 +147,8 @@ player?.addEventListener("next", () => {
 
 Override internal UI parts without writing external CSS:
 
+Built-in default player CSS is injected automatically by the package. You do not need to import any stylesheet manually for the default UI.
+
 ```tsx
 <StreamPlayer
   title="Styled Player"
