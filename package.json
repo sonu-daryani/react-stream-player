@@ -1,0 +1,30 @@
+{
+  "name": "react-stream-player",
+  "version": "0.2.4",
+  "description": "Reusable StreamFlix custom React player component",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
+    "lint": "eslint src --ext .ts,.tsx"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "lucide-react": ">=0.300.0",
+    "hls.js": ">=1.5.0",
+    "dashjs": ">=4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "eslint": "^9.38.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  }
+}
