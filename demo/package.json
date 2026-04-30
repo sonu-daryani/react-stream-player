@@ -1,0 +1,17 @@
+{
+  "name": "hls-react-player-demo",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "hls-react-player": "^0.2.6"
+  },
+  "devDependencies": {
+    "vite": "^7.1.10"
+  }
+}

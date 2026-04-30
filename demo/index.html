@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hls-react-player Vite Demo</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hls-react-player Demo</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #020617;
+        --panel: #0f172a;
+        --panel-soft: #111c33;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #3b82f6;
+        --accent-soft: rgba(59, 130, 246, 0.2);
+        --border: rgba(148, 163, 184, 0.22);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        background: radial-gradient(circle at 5% 0%, #1e293b, #020617 45%);
+        color: var(--text);
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        border-right: 1px solid var(--border);
+        background: rgba(2, 6, 23, 0.82);
+        backdrop-filter: blur(10px);
+        padding: 24px 18px;
+      }
+
+      .brand {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-top: 6px;
+      }
+
+      .menu {
+        margin-top: 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .menu a {
+        color: var(--text);
+        text-decoration: none;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 0.95rem;
+        transition: 0.2s ease;
+      }
+
+      .menu a:hover {
+        border-color: var(--border);
+        background: var(--panel-soft);
+      }
+
+      .menu a.active {
+        background: var(--accent-soft);
+        border-color: rgba(59, 130, 246, 0.4);
+      }
+
+      .content {
+        padding: 32px;
+        max-width: 1100px;
+      }
+
+      .hero {
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        background: rgba(15, 23, 42, 0.7);
+        padding: 28px;
+        margin-bottom: 24px;
+      }
+
+      h1,
+      h2 {
+        margin: 0 0 12px;
+      }
+
+      p {
+        margin: 0 0 12px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      section {
+        scroll-margin-top: 24px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 24px;
+        margin-bottom: 18px;
+        background: rgba(15, 23, 42, 0.55);
+      }
+
+      stream-player {
+        display: block;
+        width: 100%;
+        overflow: hidden;
+        border-radius: 16px;
+      }
+
+      pre {
+        margin: 0;
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #0b1222;
+        overflow-x: auto;
+        font-size: 0.9rem;
+        color: #bfdbfe;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      li {
+        margin-bottom: 8px;
+        color: var(--muted);
+      }
+
+      @media (max-width: 960px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: relative;
+          height: auto;
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1 class="brand">hls-react-player</h1>
+        <p class="subtitle">Static landing + live demo</p>
+        <nav class="menu">
+          <a href="#examples" class="active">Examples</a>
+          <a href="#quick-install">Quick Install</a>
+          <a href="#instructions">Instructions</a>
+          <a href="#api">API</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+      </aside>
+
+      <main class="content">
+        <div class="hero">
+          <h2>Build cinematic playback in minutes</h2>
+          <p>
+            This static page demonstrates the same player component in a normal HTML/CSS/JS setup
+            with sidebar navigation and live stream playback.
+          </p>
+        </div>
+
+        <section id="examples">
+          <h2>Examples</h2>
+          <p>Play, seek, fullscreen, volume, keyboard shortcuts, and settings are enabled below.</p>
+          <stream-player
+            id="demo-player"
+            title="Demo HLS Stream"
+            stream-url="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+            stream-type="hls"
+            poster-src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=80"
+          ></stream-player>
+        </section>
+
+        <section id="quick-install">
+          <h2>Quick Install</h2>
+          <pre>npm install hls-react-player react react-dom lucide-react hls.js dashjs</pre>
+        </section>
+
+        <section id="instructions">
+          <h2>Instructions</h2>
+          <pre>import { registerStreamPlayerElement } from "hls-react-player";
+registerStreamPlayerElement();</pre>
+          <p style="margin-top: 12px">Then add a `<stream-player>` element anywhere in your HTML.</p>
+        </section>
+
+        <section id="api">
+          <h2>API (HTML Attributes)</h2>
+          <ul>
+            <li><code>title</code> - Player title text</li>
+            <li><code>stream-url</code> - Video stream URL</li>
+            <li><code>stream-type</code> - <code>mp4</code>, <code>hls</code>, or <code>mpd</code></li>
+            <li><code>poster-src</code> - Poster image URL</li>
+            <li><code>embed</code> - Minimal wrapper mode</li>
+            <li><code>class-name</code> - Optional custom root class</li>
+          </ul>
+        </section>
+
+        <section id="faq">
+          <h2>FAQ</h2>
+          <ul>
+            <li>Works with React apps and plain HTML/JS via custom element.</li>
+            <li>Supports MP4, HLS, and DASH.</li>
+            <li>
+              Emits a <code>next</code> event for JS listeners when the Next button is clicked.
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+
+    <script type="module">
+      import { registerStreamPlayerElement } from "../dist/index.mjs";
+
+      registerStreamPlayerElement();
+
+      const links = Array.from(document.querySelectorAll(".menu a"));
+      const player = document.getElementById("demo-player");
+
+      player?.addEventListener("next", () => {
+        window.alert("Next episode clicked");
+      });
+
+      links.forEach((link) => {
+        link.addEventListener("click", () => {
+          links.forEach((item) => item.classList.remove("active"));
+          link.classList.add("active");
+        });
+      });
+    </script>
+  </body>
+</html>

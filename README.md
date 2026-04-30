@@ -57,6 +57,36 @@ export default function App() {
 
 ---
 
+## 🌐 Plain HTML + JavaScript Usage
+
+You can use this package without React components by registering a custom element:
+
+```js
+import { registerStreamPlayerElement } from "hls-react-player";
+
+registerStreamPlayerElement(); // registers <stream-player>
+```
+
+```html
+<stream-player
+  title="Demo Stream"
+  stream-url="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+  stream-type="hls"
+  poster-src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=80"
+></stream-player>
+```
+
+Listen to next episode clicks:
+
+```js
+const player = document.querySelector("stream-player");
+player?.addEventListener("next", () => {
+  console.log("Next clicked");
+});
+```
+
+---
+
 ## 🎥 StreamType Examples
 
 ### MP4
@@ -98,34 +128,35 @@ export default function App() {
 
 ### `<StreamPlayer />`
 
-| Prop Name    | Type                      | Default      | Description                              |
-| ------------ | ------------------------- | ------------ | ---------------------------------------- |
-| `title`      | `string`                  | **required** | Title displayed at the top of the player |
-| `streamUrl`  | `string`                  | **required** | Video/stream source URL                  |
-| `streamType` | `"mp4" \| "hls" \| "mpd"` | **required** | Streaming format                         |
-| `posterSrc`  | `string`                  | `undefined`  | Poster image                             |
-| `onNext`     | `() => void`              | `undefined`  | Triggered when "Next" button is clicked  |
-| `embed`      | `boolean`                 | `false`      | Enables embed mode (minimal UI wrapper)  |
-| `className`  | `string`                  | `undefined`  | Custom root class                        |
-| `style`      | `React.CSSProperties`     | `undefined`  | Inline styles for root                   |
-| `classNames` | `StreamPlayerClassNames`  | `{}`         | Override internal UI styles              |
+| Prop Name       | Type                      | Default      | Description                                      |
+| --------------- | ------------------------- | ------------ | ------------------------------------------------ |
+| `title`         | `string`                  | **required** | Title displayed at the top of the player         |
+| `streamUrl`     | `string`                  | **required** | Video/stream source URL                          |
+| `streamType`    | `"mp4" \| "hls" \| "mpd"` | **required** | Streaming format                                 |
+| `posterSrc`     | `string`                  | `undefined`  | Poster image                                     |
+| `onNext`        | `() => void`              | `undefined`  | Triggered when "Next" button is clicked          |
+| `embed`         | `boolean`                 | `false`      | Enables embed mode (minimal UI wrapper)          |
+| `className`     | `string`                  | `undefined`  | Custom root class                                |
+| `style`         | `React.CSSProperties`     | `undefined`  | Inline styles for root                           |
+| `classNames`    | `StreamPlayerClassNames`  | `{}`         | Replace internal className slots                 |
+| `customStyling` | `StreamPlayerCustomStyling` | `{}`       | Inline style overrides for internal UI sections  |
 
 ---
 
 ## 🎨 Custom Styling
 
-Override internal UI parts:
+Override internal UI parts without writing external CSS:
 
 ```tsx
 <StreamPlayer
   title="Styled Player"
   streamUrl="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
   streamType="hls"
-  className="rounded-none"
-  style={{ maxWidth: 900 }}
-  classNames={{
-    logoPill: "hidden",
-    bottomOverlay: "absolute inset-x-0 bottom-0 p-3 bg-black/70",
+  style={{ maxWidth: 900, borderRadius: 24 }}
+  customStyling={{
+    bottomOverlay: { padding: 20 },
+    logoPill: { letterSpacing: 0.5 },
+    timePill: { fontSize: 14 },
   }}
 />
 ```

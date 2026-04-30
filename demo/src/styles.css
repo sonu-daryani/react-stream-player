@@ -1,0 +1,167 @@
+:root {
+  color-scheme: dark;
+  --bg: #020617;
+  --panel: #0f172a;
+  --panel-soft: #111c33;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #3b82f6;
+  --accent-soft: rgba(59, 130, 246, 0.2);
+  --border: rgba(148, 163, 184, 0.22);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  background: radial-gradient(circle at 5% 0%, #1e293b, #020617 45%);
+  color: var(--text);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  border-right: 1px solid var(--border);
+  background: rgba(2, 6, 23, 0.82);
+  backdrop-filter: blur(10px);
+  padding: 24px 18px;
+}
+
+.brand {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 6px;
+}
+
+.menu {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu a {
+  color: var(--text);
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  transition: 0.2s ease;
+}
+
+.menu a:hover {
+  border-color: var(--border);
+  background: var(--panel-soft);
+}
+
+.menu a.active {
+  background: var(--accent-soft);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.content {
+  padding: 32px;
+  max-width: 1100px;
+}
+
+.hero {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.7);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+
+h1,
+h2 {
+  margin: 0 0 12px;
+}
+
+p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+section {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 18px;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.content-section {
+  display: none;
+}
+
+.content-section.active {
+  display: block;
+}
+
+stream-player {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+pre {
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #0b1222;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  color: #bfdbfe;
+}
+
+ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+li {
+  margin-bottom: 8px;
+  color: var(--muted);
+}
+
+@media (max-width: 960px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: relative;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}

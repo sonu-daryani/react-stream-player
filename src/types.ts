@@ -14,6 +14,19 @@ export type StreamPlayerClassNames = {
   timePill: string;
 };
 
+export type StreamPlayerCustomStyling = {
+  root?: CSSProperties;
+  frame?: CSSProperties;
+  video?: CSSProperties;
+  topOverlay?: CSSProperties;
+  bottomOverlay?: CSSProperties;
+  leftControls?: CSSProperties;
+  rightControls?: CSSProperties;
+  logoPill?: CSSProperties;
+  timePill?: CSSProperties;
+  progress?: CSSProperties;
+};
+
 export type StreamPlayerProps = {
   title: string;
   streamUrl: string;
@@ -24,4 +37,5 @@ export type StreamPlayerProps = {
   className?: string;
   style?: CSSProperties;
   classNames?: Partial<StreamPlayerClassNames>;
+  customStyling?: StreamPlayerCustomStyling;
 };

@@ -15,24 +15,20 @@ import {
   VolumeX,
 } from "lucide-react";
 import type { StreamPlayerClassNames, StreamPlayerProps } from "./types";
+import "./stream-player.css";
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(" ");
 
 const defaultClassNames: StreamPlayerClassNames = {
-  root: "overflow-hidden rounded-2xl border border-[#1e2a44] bg-[#060b16] shadow-[0_25px_70px_rgba(0,0,0,0.65)]",
-  frame: "relative",
-  video: "aspect-video w-full bg-black",
-  topOverlay:
-    "pointer-events-none absolute inset-x-0 top-0 bg-gradient-to-b from-[#020817]/95 via-[#020817]/45 to-transparent p-4",
-  bottomOverlay:
-    "absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#020817] via-[#020817]/90 to-transparent p-4",
-  leftControls:
-    "mx-auto flex items-center gap-2 rounded-full border border-white/15 bg-[#0f172a]/90 px-2 py-1.5 backdrop-blur md:mx-0",
-  rightControls: "ml-auto flex items-center gap-2",
-  logoPill:
-    "flex items-center gap-1 rounded-full border border-white/15 bg-[#0f172a]/90 px-3 py-2 text-xs font-semibold tracking-wide text-white/85 backdrop-blur",
-  timePill:
-    "rounded-full border border-white/15 bg-[#0f172a]/90 px-3 py-2 tabular-nums text-white/80 backdrop-blur",
+  root: "rsp-root",
+  frame: "rsp-frame",
+  video: "rsp-video",
+  topOverlay: "rsp-top-overlay",
+  bottomOverlay: "rsp-bottom-overlay",
+  leftControls: "rsp-left-controls",
+  rightControls: "rsp-right-controls",
+  logoPill: "rsp-logo-pill",
+  timePill: "rsp-time-pill",
 };
 
 const formatTime = (seconds: number) => {
@@ -57,6 +53,7 @@ export default function StreamPlayer({
   className,
   style,
   classNames,
+  customStyling,
 }: StreamPlayerProps) {
   const ui = { ...defaultClassNames, ...classNames };
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -473,12 +470,13 @@ export default function StreamPlayer({
 
   return (
     <div
-      className={cx(embed ? "overflow-hidden bg-black" : ui.root, className)}
-      style={style}
+      className={cx(embed ? "rsp-embed-root" : ui.root, className)}
+      style={{ ...customStyling?.root, ...style }}
     >
       <div
         ref={wrapperRef}
         className={ui.frame}
+        style={customStyling?.frame}
         tabIndex={0}
         onMouseMove={revealControls}
         onTouchStart={revealControls}
@@ -487,6 +485,7 @@ export default function StreamPlayer({
         <video
           ref={videoRef}
           className={ui.video}
+          style={customStyling?.video}
           poster={posterSrc}
           autoPlay
           playsInline
@@ -507,32 +506,33 @@ export default function StreamPlayer({
         <div
           className={cx(
             ui.topOverlay,
-            "transition-opacity duration-300",
-            areControlsVisible ? "opacity-100" : "pointer-events-none opacity-0",
+            "rsp-fade-overlay",
+            areControlsVisible ? "rsp-visible" : "rsp-hidden",
           )}
+          style={customStyling?.topOverlay}
         >
-          <div className="flex items-start justify-between gap-3">
+          <div className="rsp-top-inner">
             <div>
-              <p className="text-sm font-semibold text-white">{title}</p>
+              <p className="rsp-title">{title}</p>
             </div>
           </div>
         </div>
 
         {isBuffering ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-[#020817]/45">
-            <div className="flex items-center gap-3 rounded-full border border-blue-300/20 bg-[#0f172a]/85 px-4 py-2 text-sm text-white backdrop-blur">
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-blue-200 border-t-transparent" />
+          <div className="rsp-buffer-overlay">
+            <div className="rsp-buffer-chip">
+              <span className="rsp-spinner" />
               Buffering...
             </div>
           </div>
         ) : null}
 
         {!isPlaying && !isBuffering ? (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="rsp-center-overlay">
             <button
               type="button"
               onClick={togglePlay}
-              className="pointer-events-auto rounded-full border border-white/20 bg-[#0f172a]/80 px-6 py-4 text-base font-semibold text-white backdrop-blur transition hover:bg-[#1e293b]/90"
+              className="rsp-main-play-btn"
               aria-label="Play"
             >
               <Play size={24} />
@@ -543,9 +543,10 @@ export default function StreamPlayer({
         <div
           className={cx(
             ui.bottomOverlay,
-            "transition-opacity duration-300",
-            areControlsVisible ? "opacity-100" : "pointer-events-none opacity-0",
+            "rsp-fade-overlay",
+            areControlsVisible ? "rsp-visible" : "rsp-hidden",
           )}
+          style={customStyling?.bottomOverlay}
         >
           <input
             type="range"
@@ -554,29 +555,30 @@ export default function StreamPlayer({
             step={0.1}
             value={currentTime}
             onChange={handleSeek}
-            className="h-1.5 w-full cursor-pointer appearance-none rounded-full accent-blue-500"
+            className="rsp-progress"
             style={{
+              ...customStyling?.progress,
               background: `linear-gradient(to right, #3b82f6 ${progress}%, #334155 ${progress}%)`,
             }}
           />
 
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-white">
-            <div className={ui.leftControls}>
+          <div className="rsp-controls-row">
+            <div className={ui.leftControls} style={customStyling?.leftControls}>
               <button
                 type="button"
                 onClick={() => seekBy(-10)}
-                className="rounded-full px-3 py-1.5 transition hover:bg-white/10"
+                className="rsp-btn rsp-btn-ghost"
                 aria-label="Back 10 seconds"
               >
-                <span className="flex items-center gap-1">
+                <span className="rsp-btn-icon-group">
                   <RotateCcw size={16} />
-                  <span className="text-xs">10</span>
+                  <span className="rsp-btn-caption">10</span>
                 </span>
               </button>
               <button
                 type="button"
                 onClick={togglePlay}
-                className="rounded-full bg-blue-500 px-4 py-2 font-medium transition hover:bg-blue-400"
+                className="rsp-btn rsp-btn-primary"
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
                 {isPlaying ? <Pause size={18} /> : <Play size={18} />}
@@ -584,11 +586,11 @@ export default function StreamPlayer({
               <button
                 type="button"
                 onClick={() => seekBy(10)}
-                className="rounded-full px-3 py-1.5 transition hover:bg-white/10"
+                className="rsp-btn rsp-btn-ghost"
                 aria-label="Forward 10 seconds"
               >
-                <span className="flex items-center gap-1">
-                  <span className="text-xs">10</span>
+                <span className="rsp-btn-icon-group">
+                  <span className="rsp-btn-caption">10</span>
                   <RotateCw size={16} />
                 </span>
               </button>
@@ -596,29 +598,29 @@ export default function StreamPlayer({
                 <button
                   type="button"
                   onClick={onNext}
-                  className="rounded-full px-3 py-1.5 transition hover:bg-white/10"
+                  className="rsp-btn rsp-btn-ghost"
                   aria-label="Next episode"
                 >
                   <SkipForward size={16} />
                 </button>
               ) : null}
-              <div ref={settingsRef} className="relative">
+              <div ref={settingsRef} className="rsp-relative">
                 <button
                   type="button"
                   onClick={() => setIsSettingsOpen((prev) => !prev)}
-                  className="rounded-full px-3 py-1.5 transition hover:bg-white/10"
+                  className="rsp-btn rsp-btn-ghost"
                   aria-label="Player settings"
                 >
                   <Settings size={16} />
                 </button>
                 {isSettingsOpen ? (
-                  <div className="absolute bottom-full right-0 z-20 mb-2 w-56 rounded-xl border border-white/20 bg-[#0b1222]/95 p-3 shadow-2xl backdrop-blur">
-                    <div className="space-y-2">
-                      <label className="block text-xs text-zinc-300">Subtitle</label>
+                  <div className="rsp-settings-menu">
+                    <div className="rsp-settings-group">
+                      <label className="rsp-select-label">Subtitle</label>
                       <select
                         value={selectedSubtitle}
                         onChange={(event) => onSelectSubtitle(event.target.value)}
-                        className="w-full rounded-md border border-white/15 bg-[#0f172a] px-2 py-1.5 text-xs text-white outline-none"
+                        className="rsp-select"
                       >
                         {subtitleOptions.map((option) => (
                           <option key={option} value={option}>
@@ -627,12 +629,12 @@ export default function StreamPlayer({
                         ))}
                       </select>
                     </div>
-                    <div className="mt-3 space-y-2">
-                      <label className="block text-xs text-zinc-300">Audio</label>
+                    <div className="rsp-settings-group">
+                      <label className="rsp-select-label">Audio</label>
                       <select
                         value={selectedAudio}
                         onChange={(event) => onSelectAudio(event.target.value)}
-                        className="w-full rounded-md border border-white/15 bg-[#0f172a] px-2 py-1.5 text-xs text-white outline-none"
+                        className="rsp-select"
                       >
                         {audioOptions.map((option) => (
                           <option key={option} value={option}>
@@ -641,12 +643,12 @@ export default function StreamPlayer({
                         ))}
                       </select>
                     </div>
-                    <div className="mt-3 space-y-2">
-                      <label className="block text-xs text-zinc-300">Resolution</label>
+                    <div className="rsp-settings-group">
+                      <label className="rsp-select-label">Resolution</label>
                       <select
                         value={selectedResolution}
                         onChange={(event) => onSelectResolution(event.target.value)}
-                        className="w-full rounded-md border border-white/15 bg-[#0f172a] px-2 py-1.5 text-xs text-white outline-none"
+                        className="rsp-select"
                       >
                         {resolutionOptions.map((option) => (
                           <option key={option} value={option}>
@@ -660,21 +662,21 @@ export default function StreamPlayer({
               </div>
             </div>
 
-            <div className={ui.rightControls}>
-              <span className={ui.logoPill}>
+            <div className={ui.rightControls} style={customStyling?.rightControls}>
+              <span className={ui.logoPill} style={customStyling?.logoPill}>
                 <Clapperboard size={14} />
                 StreamFlix
               </span>
-              <div className="group/volume relative flex items-center gap-2 rounded-full border border-white/15 bg-[#0f172a]/90 px-3 py-2 backdrop-blur">
+              <div className="rsp-volume-group">
                 <button
                   type="button"
                   onClick={toggleMute}
-                  className="rounded-full p-1 transition hover:bg-white/10"
+                  className="rsp-icon-btn"
                   aria-label={isMuted ? "Unmute" : "Mute"}
                 >
                   {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
                 </button>
-                <div className="pointer-events-none absolute bottom-full left-1/2 mb-3 -translate-x-1/2 rounded-xl border border-white/15 bg-[#0f172a]/95 p-2 opacity-0 shadow-xl backdrop-blur transition duration-200 group-hover/volume:pointer-events-auto group-hover/volume:opacity-100 group-focus-within/volume:pointer-events-auto group-focus-within/volume:opacity-100">
+                <div className="rsp-volume-slider-popover">
                   <input
                     type="range"
                     min={0}
@@ -682,18 +684,18 @@ export default function StreamPlayer({
                     step={0.05}
                     value={isMuted ? 0 : volume}
                     onChange={handleVolume}
-                    className="h-24 w-1.5 cursor-pointer appearance-none rounded-full accent-blue-500"
+                    className="rsp-volume-slider"
                     style={{ writingMode: "vertical-lr", direction: "rtl" }}
                   />
                 </div>
               </div>
-              <span className={ui.timePill}>
+              <span className={ui.timePill} style={customStyling?.timePill}>
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
               <button
                 type="button"
                 onClick={toggleFullscreen}
-                className="rounded-full border border-white/15 bg-[#0f172a]/90 px-3 py-2 transition hover:bg-white/10"
+                className="rsp-btn rsp-btn-chip"
                 aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
               >
                 {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
