@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 export type StreamType = "mp4" | "hls" | "mpd";
 
@@ -36,6 +36,8 @@ export type StreamPlayerProps = {
   embed?: boolean;
   className?: string;
   style?: CSSProperties;
+  showLogo?: boolean;
+  customLogo?: ReactNode;
   classNames?: Partial<StreamPlayerClassNames>;
   customStyling?: StreamPlayerCustomStyling;
 };

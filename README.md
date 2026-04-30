@@ -25,13 +25,9 @@ npm install hls-react-player
 
 ---
 
-## 🔗 Peer Dependencies
+## 🔗 Dependencies
 
-Make sure these are installed:
-
-```bash
-npm install react react-dom lucide-react hls.js dashjs
-```
+No extra installs are required. `hls-react-player` bundles everything it needs, including React runtime, icons, and stream engines.
 
 ---
 
@@ -138,6 +134,8 @@ player?.addEventListener("next", () => {
 | `embed`         | `boolean`                 | `false`      | Enables embed mode (minimal UI wrapper)          |
 | `className`     | `string`                  | `undefined`  | Custom root class                                |
 | `style`         | `React.CSSProperties`     | `undefined`  | Inline styles for root                           |
+| `showLogo`      | `boolean`                 | `true`       | Show or hide the branding pill                   |
+| `customLogo`    | `ReactNode`               | `undefined`  | Render custom logo/content inside branding pill  |
 | `classNames`    | `StreamPlayerClassNames`  | `{}`         | Replace internal className slots                 |
 | `customStyling` | `StreamPlayerCustomStyling` | `{}`       | Inline style overrides for internal UI sections  |
 
@@ -160,6 +158,24 @@ Built-in default player CSS is injected automatically by the package. You do not
     logoPill: { letterSpacing: 0.5 },
     timePill: { fontSize: 14 },
   }}
+/>
+```
+
+### Branding Control
+
+```tsx
+<StreamPlayer
+  title="No Branding"
+  streamUrl="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+  streamType="hls"
+  showLogo={false}
+/>
+
+<StreamPlayer
+  title="Custom Branding"
+  streamUrl="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+  streamType="hls"
+  customLogo={<span>MyOTT</span>}
 />
 ```
 

@@ -1,6 +1,6 @@
 {
   "name": "hls-react-player",
-  "version": "0.2.7",
+  "version": "0.3.0",
   "description": "Reusable StreamFlix custom React player component",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -18,19 +18,19 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts",
-    "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "lint": "eslint src --ext .ts,.tsx",
     "demo:install": "npm install --prefix demo",
     "demo:dev": "npm run dev --prefix demo",
     "demo:build": "npm run build --prefix demo"
   },
-  "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18",
-    "lucide-react": ">=0.300.0",
-    "hls.js": ">=1.5.0",
-    "dashjs": ">=4.0.0"
+  "dependencies": {
+    "dashjs": "^5.0.3",
+    "hls.js": "^1.6.13",
+    "lucide-react": "^0.552.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.2",

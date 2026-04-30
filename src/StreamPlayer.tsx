@@ -53,6 +53,8 @@ export default function StreamPlayer({
   embed = false,
   className,
   style,
+  showLogo = false,
+  customLogo,
   classNames,
   customStyling,
 }: StreamPlayerProps) {
@@ -668,10 +670,15 @@ export default function StreamPlayer({
             </div>
 
             <div className={ui.rightControls} style={customStyling?.rightControls}>
-              <span className={ui.logoPill} style={customStyling?.logoPill}>
-                <Clapperboard size={14} />
-                StreamFlix
-              </span>
+              {showLogo && customLogo ? (
+                <span className={ui.logoPill} style={customStyling?.logoPill}>
+                  {customLogo}
+                </span>
+              ) : showLogo ? (
+                <span className={ui.logoPill} style={customStyling?.logoPill}>
+                  <Clapperboard size={14} />
+                </span>
+              ) : null}
               <div className="rsp-volume-group">
                 <button
                   type="button"

@@ -24,11 +24,19 @@ document.querySelector("#app").innerHTML = `
           This Vite demo shows the integrated player package with sidebar navigation and
           section-based documentation.
         </p>
+        <div class="hero-grid">
+          <div class="chip">MP4 / HLS / DASH</div>
+          <div class="chip">Fullscreen Auto-Hide Controls</div>
+          <div class="chip">React + Web Component Support</div>
+        </div>
       </div>
 
       <section id="examples" class="content-section active">
         <h2>Examples</h2>
-        <p>Play, seek, fullscreen, volume, keyboard shortcuts, and settings are enabled below.</p>
+        <p>
+          Play, seek, fullscreen, volume, keyboard shortcuts, quality/audio/subtitle selection, and
+          settings menu are enabled below.
+        </p>
         <stream-player
           id="demo-player"
           title="Demo HLS Stream"
@@ -36,38 +44,77 @@ document.querySelector("#app").innerHTML = `
           stream-type="hls"
           poster-src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=80"
         ></stream-player>
+        <h3 class="subheading">Try these interactions</h3>
+        <ul>
+          <li>Press <code>K</code> or <code>Space</code> for play/pause.</li>
+          <li>Press <code>J</code>/<code>L</code> or Arrow Left/Right for 10s seek.</li>
+          <li>Press <code>F</code> for fullscreen and wait 5s to see controls auto-hide.</li>
+          <li>Use settings gear for subtitle/audio/resolution options.</li>
+        </ul>
       </section>
 
       <section id="quick-install" class="content-section">
         <h2>Quick Install</h2>
         <pre>npm install hls-react-player react react-dom lucide-react hls.js dashjs</pre>
+        <h3 class="subheading">Minimal React usage</h3>
+        <pre>import { StreamPlayer } from "hls-react-player";
+
+export default function App() {
+  return (
+    <StreamPlayer
+      title="Demo Stream"
+      streamUrl="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+      streamType="hls"
+      posterSrc="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=80"
+    />
+  );
+}</pre>
       </section>
 
       <section id="instructions" class="content-section">
         <h2>Instructions</h2>
+        <p>Use as a native custom element in plain HTML/JS projects:</p>
         <pre>import { registerStreamPlayerElement } from "hls-react-player";
-registerStreamPlayerElement();</pre>
-        <p style="margin-top: 12px">Then add a &lt;stream-player&gt; element anywhere in your HTML.</p>
+registerStreamPlayerElement();
+
+// HTML
+// &lt;stream-player title="Movie" stream-url="..." stream-type="hls"&gt;&lt;/stream-player&gt;</pre>
+        <h3 class="subheading">Branding options</h3>
+        <pre>&lt;StreamPlayer showLogo={false} /&gt;
+&lt;StreamPlayer customLogo={&lt;span&gt;MyOTT&lt;/span&gt;} /&gt;</pre>
       </section>
 
       <section id="api" class="content-section">
-        <h2>API (HTML Attributes)</h2>
+        <h2>API</h2>
+        <h3 class="subheading">Core props</h3>
         <ul>
-          <li><code>title</code> - Player title text</li>
-          <li><code>stream-url</code> - Video stream URL</li>
-          <li><code>stream-type</code> - <code>mp4</code>, <code>hls</code>, or <code>mpd</code></li>
-          <li><code>poster-src</code> - Poster image URL</li>
-          <li><code>embed</code> - Minimal wrapper mode</li>
-          <li><code>class-name</code> - Optional custom root class</li>
+          <li><code>title</code> - Player title text.</li>
+          <li><code>streamUrl</code> / <code>stream-url</code> - Video stream URL.</li>
+          <li><code>streamType</code> / <code>stream-type</code> - <code>mp4</code>, <code>hls</code>, or <code>mpd</code>.</li>
+          <li><code>posterSrc</code> / <code>poster-src</code> - Poster image URL.</li>
+          <li><code>showLogo</code> - Show/hide branding pill.</li>
+          <li><code>customLogo</code> - Custom React node for branding.</li>
+          <li><code>customStyling</code> - Inline style overrides for internal parts.</li>
         </ul>
+        <div class="card-grid">
+          <div class="mini-card">
+            <strong>Event</strong>
+            <span class="muted"><code>next</code> custom event (web component) when Next button is pressed.</span>
+          </div>
+          <div class="mini-card">
+            <strong>Styling</strong>
+            <span class="muted">Default styles are injected automatically; no manual CSS import needed.</span>
+          </div>
+        </div>
       </section>
 
       <section id="faq" class="content-section">
         <h2>FAQ</h2>
         <ul>
-          <li>Works with React apps and plain HTML/JS via custom element.</li>
-          <li>Supports MP4, HLS, and DASH.</li>
-          <li>Emits a <code>next</code> event for JS listeners when Next is clicked.</li>
+          <li><strong>Does this need Tailwind in my app?</strong> No. Package ships and injects its own default styles.</li>
+          <li><strong>Can I customize appearance?</strong> Yes. Use <code>classNames</code> and <code>customStyling</code>.</li>
+          <li><strong>Can I hide branding?</strong> Yes, set <code>showLogo={false}</code> or pass <code>customLogo</code>.</li>
+          <li><strong>Does it work outside React?</strong> Yes, via <code>registerStreamPlayerElement()</code>.</li>
         </ul>
       </section>
     </main>
