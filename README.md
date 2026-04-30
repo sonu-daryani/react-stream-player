@@ -1,7 +1,3 @@
-Here’s your **complete `README.md`** rewritten cleanly with a full props table and proper structure:
-
----
-
 # react-stream-player
 
 Reusable React video player component extracted from the StreamFlix app. Supports **MP4**, **HLS (m3u8)**, and **DASH (mpd)** streams with a modern UI and customizable controls.
