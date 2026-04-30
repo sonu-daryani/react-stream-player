@@ -4,6 +4,5 @@ export default defineConfig({
   entry: ["src/index.ts"],
   format: ["esm", "cjs"],
   dts: true,
-  noExternal: ["react", "react-dom", "lucide-react", "hls.js", "dashjs"],
 });
 
