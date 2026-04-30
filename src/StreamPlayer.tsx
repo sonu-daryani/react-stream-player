@@ -14,11 +14,11 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
-import type { CustomPlayerClassNames, CustomPlayerProps } from "./types";
+import type { StreamPlayerClassNames, StreamPlayerProps } from "./types";
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(" ");
 
-const defaultClassNames: CustomPlayerClassNames = {
+const defaultClassNames: StreamPlayerClassNames = {
   root: "overflow-hidden rounded-2xl border border-[#1e2a44] bg-[#060b16] shadow-[0_25px_70px_rgba(0,0,0,0.65)]",
   frame: "relative",
   video: "aspect-video w-full bg-black",
@@ -47,7 +47,7 @@ const formatTime = (seconds: number) => {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
 
-export default function CustomPlayer({
+export default function StreamPlayer({
   title,
   streamUrl,
   streamType,
@@ -57,11 +57,12 @@ export default function CustomPlayer({
   className,
   style,
   classNames,
-}: CustomPlayerProps) {
+}: StreamPlayerProps) {
   const ui = { ...defaultClassNames, ...classNames };
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const settingsRef = useRef<HTMLDivElement | null>(null);
+  const controlsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hlsRef = useRef<{
     levels: Array<{ height?: number }>;
     audioTracks?: Array<{ name?: string; lang?: string }>;
@@ -77,6 +78,7 @@ export default function CustomPlayer({
   const [isBuffering, setIsBuffering] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [areControlsVisible, setAreControlsVisible] = useState(true);
   const [subtitleOptions, setSubtitleOptions] = useState<string[]>(["Off"]);
   const [audioOptions, setAudioOptions] = useState<string[]>(["Default"]);
   const [resolutionOptions, setResolutionOptions] = useState<string[]>(["Auto"]);
@@ -235,6 +237,44 @@ export default function CustomPlayer({
     setSubtitleOptions(subtitleList);
     setSelectedSubtitle("Off");
   }, [streamUrl]);
+
+  const clearControlsHideTimer = useCallback(() => {
+    if (!controlsTimerRef.current) return;
+    clearTimeout(controlsTimerRef.current);
+    controlsTimerRef.current = null;
+  }, []);
+
+  const scheduleControlsHide = useCallback(() => {
+    clearControlsHideTimer();
+    controlsTimerRef.current = setTimeout(() => {
+      setAreControlsVisible(false);
+      setIsSettingsOpen(false);
+    }, 5000);
+  }, [clearControlsHideTimer]);
+
+  const revealControls = useCallback(() => {
+    setAreControlsVisible(true);
+    if (isFullscreen && isPlaying) {
+      scheduleControlsHide();
+    }
+  }, [isFullscreen, isPlaying, scheduleControlsHide]);
+
+  useEffect(() => {
+    if (isFullscreen && isPlaying) {
+      setAreControlsVisible(true);
+      scheduleControlsHide();
+      return;
+    }
+
+    clearControlsHideTimer();
+    setAreControlsVisible(true);
+  }, [clearControlsHideTimer, isFullscreen, isPlaying, scheduleControlsHide]);
+
+  useEffect(() => {
+    return () => {
+      clearControlsHideTimer();
+    };
+  }, [clearControlsHideTimer]);
 
   useEffect(() => {
     const onDocumentClick = (event: MouseEvent) => {
@@ -422,19 +462,28 @@ export default function CustomPlayer({
         default:
           break;
       }
+
+      revealControls();
     };
 
     wrapper.addEventListener("keydown", onKeyDown);
     wrapper.focus();
     return () => wrapper.removeEventListener("keydown", onKeyDown);
-  }, [adjustVolumeBy, duration, seekBy, togglePlay]);
+  }, [adjustVolumeBy, duration, revealControls, seekBy, togglePlay]);
 
   return (
     <div
       className={cx(embed ? "overflow-hidden bg-black" : ui.root, className)}
       style={style}
     >
-      <div ref={wrapperRef} className={ui.frame} tabIndex={0}>
+      <div
+        ref={wrapperRef}
+        className={ui.frame}
+        tabIndex={0}
+        onMouseMove={revealControls}
+        onTouchStart={revealControls}
+        onClick={revealControls}
+      >
         <video
           ref={videoRef}
           className={ui.video}
@@ -455,7 +504,13 @@ export default function CustomPlayer({
           Your browser does not support HTML video.
         </video>
 
-        <div className={ui.topOverlay}>
+        <div
+          className={cx(
+            ui.topOverlay,
+            "transition-opacity duration-300",
+            areControlsVisible ? "opacity-100" : "pointer-events-none opacity-0",
+          )}
+        >
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-white">{title}</p>
@@ -485,7 +540,13 @@ export default function CustomPlayer({
           </div>
         ) : null}
 
-        <div className={ui.bottomOverlay}>
+        <div
+          className={cx(
+            ui.bottomOverlay,
+            "transition-opacity duration-300",
+            areControlsVisible ? "opacity-100" : "pointer-events-none opacity-0",
+          )}
+        >
           <input
             type="range"
             min={0}

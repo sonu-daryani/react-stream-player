@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 
 export type StreamType = "mp4" | "hls" | "mpd";
 
-export type CustomPlayerClassNames = {
+export type StreamPlayerClassNames = {
   root: string;
   frame: string;
   video: string;
@@ -14,7 +14,7 @@ export type CustomPlayerClassNames = {
   timePill: string;
 };
 
-export type CustomPlayerProps = {
+export type StreamPlayerProps = {
   title: string;
   streamUrl: string;
   streamType: StreamType;
@@ -23,5 +23,5 @@ export type CustomPlayerProps = {
   embed?: boolean;
   className?: string;
   style?: CSSProperties;
-  classNames?: Partial<CustomPlayerClassNames>;
+  classNames?: Partial<StreamPlayerClassNames>;
 };

@@ -1,4 +1,4 @@
-# react-stream-player
+# hls-react-player
 
 Reusable React video player component extracted from the StreamFlix app. Supports **MP4**, **HLS (m3u8)**, and **DASH (mpd)** streams with a modern UI and customizable controls.
 
@@ -20,7 +20,7 @@ Reusable React video player component extracted from the StreamFlix app. Support
 ## 📦 Install
 
 ```bash
-npm install react-stream-player
+npm install hls-react-player
 ```
 
 ---
@@ -38,14 +38,14 @@ npm install react react-dom lucide-react hls.js dashjs
 ## 🚀 Usage
 
 ```tsx
-import { CustomPlayer } from "react-stream-player";
-import type { StreamType } from "react-stream-player";
+import { StreamPlayer } from "hls-react-player";
+import type { StreamType } from "hls-react-player";
 
 const streamType: StreamType = "hls";
 
 export default function App() {
   return (
-    <CustomPlayer
+    <StreamPlayer
       title="Demo Stream"
       streamUrl="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
       streamType={streamType}
@@ -62,7 +62,7 @@ export default function App() {
 ### MP4
 
 ```tsx
-<CustomPlayer
+<StreamPlayer
   title="MP4 Example"
   streamUrl="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
   streamType="mp4"
@@ -73,7 +73,7 @@ export default function App() {
 ### HLS (m3u8)
 
 ```tsx
-<CustomPlayer
+<StreamPlayer
   title="HLS Example"
   streamUrl="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
   streamType="hls"
@@ -84,7 +84,7 @@ export default function App() {
 ### DASH (MPD)
 
 ```tsx
-<CustomPlayer
+<StreamPlayer
   title="MPD Example"
   streamUrl="https://dash.akamaized.net/envivio/EnvivioDash3/manifest.mpd"
   streamType="mpd"
@@ -96,7 +96,7 @@ export default function App() {
 
 ## ⚙️ Props
 
-### `<CustomPlayer />`
+### `<StreamPlayer />`
 
 | Prop Name    | Type                      | Default      | Description                              |
 | ------------ | ------------------------- | ------------ | ---------------------------------------- |
@@ -108,7 +108,7 @@ export default function App() {
 | `embed`      | `boolean`                 | `false`      | Enables embed mode (minimal UI wrapper)  |
 | `className`  | `string`                  | `undefined`  | Custom root class                        |
 | `style`      | `React.CSSProperties`     | `undefined`  | Inline styles for root                   |
-| `classNames` | `CustomPlayerClassNames`  | `{}`         | Override internal UI styles              |
+| `classNames` | `StreamPlayerClassNames`  | `{}`         | Override internal UI styles              |
 
 ---
 
@@ -117,7 +117,7 @@ export default function App() {
 Override internal UI parts:
 
 ```tsx
-<CustomPlayer
+<StreamPlayer
   title="Styled Player"
   streamUrl="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
   streamType="hls"
@@ -130,7 +130,7 @@ Override internal UI parts:
 />
 ```
 
-### `CustomPlayerClassNames`
+### `StreamPlayerClassNames`
 
 | Key             | Description         |
 | --------------- | ------------------- |
@@ -151,7 +151,7 @@ Override internal UI parts:
 Use for iframe/widget embedding:
 
 ```tsx
-<CustomPlayer
+<StreamPlayer
   title="Embedded Stream"
   streamUrl="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
   streamType="hls"

@@ -1,2 +1,2 @@
-export { default as CustomPlayer } from "./CustomPlayer";
-export type { CustomPlayerProps, StreamType } from "./types";
+export { default as StreamPlayer } from "./StreamPlayer";
+export type { StreamPlayerProps, StreamType } from "./types";
