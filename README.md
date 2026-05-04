@@ -46,7 +46,7 @@ npm run demo:install
 npm run demo:dev
 ```
 
-The demo under `demo/` resolves the parent package via `file:..` in `demo/package.json` so you can run it before publishing. See [`demo/README.md`](demo/README.md).
+The demo under `demo/` installs **`hls-react-player` from npm** (see `demo/package.json` for the semver range).
 
 ---
 

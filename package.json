@@ -1,7 +1,15 @@
 {
   "name": "hls-react-player",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "React video player for MP4, HLS, and DASH",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sonu-daryani/react-stream-player.git"
+  },
+  "homepage": "https://github.com/sonu-daryani/react-stream-player#readme",
+  "bugs": {
+    "url": "https://github.com/sonu-daryani/react-stream-player/issues"
+  },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
