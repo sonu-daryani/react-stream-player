@@ -1,4 +1,5 @@
 import "./styles.css";
+import "hls-react-player/styles.css";
 import { registerStreamPlayerElement } from "hls-react-player";
 
 registerStreamPlayerElement();
@@ -21,8 +22,8 @@ document.querySelector("#app").innerHTML = `
       <div class="hero">
         <h2>Build cinematic playback in minutes</h2>
         <p>
-          This Vite demo shows the integrated player package with sidebar navigation and
-          section-based documentation.
+          Install with <code>npm run demo:install</code> from the package root, then <code>npm run demo:dev</code>.
+          The demo depends on the parent folder via <code>file:..</code> in <code>demo/package.json</code>.
         </p>
         <div class="hero-grid">
           <div class="chip">MP4 / HLS / DASH</div>
@@ -55,9 +56,11 @@ document.querySelector("#app").innerHTML = `
 
       <section id="quick-install" class="content-section">
         <h2>Quick Install</h2>
-        <pre>npm install hls-react-player react react-dom lucide-react hls.js dashjs</pre>
+        <pre>npm install hls-react-player react react-dom</pre>
+        <p class="muted">Peer: React 18+. The package bundles <code>hls.js</code>, <code>dashjs</code>, and <code>lucide-react</code> icons.</p>
         <h3 class="subheading">Minimal React usage</h3>
-        <pre>import { StreamPlayer } from "hls-react-player";
+        <pre>import "hls-react-player/styles.css";
+import { StreamPlayer } from "hls-react-player";
 
 export default function App() {
   return (
@@ -79,9 +82,9 @@ registerStreamPlayerElement();
 
 // HTML
 // &lt;stream-player title="Movie" stream-url="..." stream-type="hls"&gt;&lt;/stream-player&gt;</pre>
-        <h3 class="subheading">Branding options</h3>
-        <pre>&lt;StreamPlayer showLogo={false} /&gt;
-&lt;StreamPlayer customLogo={&lt;span&gt;MyOTT&lt;/span&gt;} /&gt;</pre>
+        <h3 class="subheading">Branding (top-right)</h3>
+        <pre>// Logo shows only when BOTH are set — pass your mark as customLogo
+&lt;StreamPlayer showLogo customLogo={&lt;span&gt;MyOTT&lt;/span&gt;} /&gt;</pre>
       </section>
 
       <section id="api" class="content-section">
@@ -92,8 +95,8 @@ registerStreamPlayerElement();
           <li><code>streamUrl</code> / <code>stream-url</code> - Video stream URL.</li>
           <li><code>streamType</code> / <code>stream-type</code> - <code>mp4</code>, <code>hls</code>, or <code>mpd</code>.</li>
           <li><code>posterSrc</code> / <code>poster-src</code> - Poster image URL.</li>
-          <li><code>showLogo</code> - Show/hide branding pill.</li>
-          <li><code>customLogo</code> - Custom React node for branding.</li>
+          <li><code>showLogo</code> + <code>customLogo</code> — Top-right branding pill (both required to show).</li>
+          <li><code>seekThumbnail</code> (React) / <code>seek-thumbnail</code> (element) — WebVTT sprite URL for scrub thumbnails (optional). Legacy: <code>previewStoryboardVttUrl</code>.</li>
           <li><code>customStyling</code> - Inline style overrides for internal parts.</li>
         </ul>
         <div class="card-grid">
@@ -103,7 +106,7 @@ registerStreamPlayerElement();
           </div>
           <div class="mini-card">
             <strong>Styling</strong>
-            <span class="muted">Default styles are injected automatically; no manual CSS import needed.</span>
+            <span class="muted">Import <code>hls-react-player/styles.css</code> once in your app (or in this demo’s entry).</span>
           </div>
         </div>
       </section>
@@ -111,9 +114,9 @@ registerStreamPlayerElement();
       <section id="faq" class="content-section">
         <h2>FAQ</h2>
         <ul>
-          <li><strong>Does this need Tailwind in my app?</strong> No. Package ships and injects its own default styles.</li>
+          <li><strong>Does this need Tailwind in my app?</strong> No. Import the package stylesheet; no Tailwind required.</li>
           <li><strong>Can I customize appearance?</strong> Yes. Use <code>classNames</code> and <code>customStyling</code>.</li>
-          <li><strong>Can I hide branding?</strong> Yes, set <code>showLogo={false}</code> or pass <code>customLogo</code>.</li>
+          <li><strong>Branding?</strong> Omit <code>customLogo</code> or set <code>showLogo={false}</code>. To show a logo, set both <code>showLogo</code> and <code>customLogo</code>.</li>
           <li><strong>Does it work outside React?</strong> Yes, via <code>registerStreamPlayerElement()</code>.</li>
         </ul>
       </section>

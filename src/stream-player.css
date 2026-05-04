@@ -4,6 +4,8 @@
   border: 1px solid #1e2a44;
   background: #060b16;
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.65);
+  width: 100%;
+  max-width: 100%;
 }
 
 .rsp-embed-root {
@@ -17,6 +19,7 @@
 
 .rsp-frame {
   position: relative;
+  width: 100%;
 }
 
 .rsp-video {
@@ -31,20 +34,44 @@
   position: absolute;
   inset: 0 0 auto 0;
   padding: 16px;
+  --rsp-logo-inset-y: 16px;
+  --rsp-logo-inset-x: 16px;
   background: linear-gradient(to bottom, rgba(2, 8, 23, 0.95), rgba(2, 8, 23, 0.45), transparent);
 }
 
 .rsp-bottom-overlay {
   position: absolute;
   inset: auto 0 0 0;
+  z-index: 11;
   padding: 16px;
   background: linear-gradient(to top, rgba(2, 8, 23, 1), rgba(2, 8, 23, 0.9), transparent);
 }
 
 .rsp-top-inner {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-width: 0;
+}
+
+.rsp-top-overlay--has-logo .rsp-title {
+  max-width: calc(100% - 112px);
+  padding-right: 8px;
+  box-sizing: border-box;
+}
+
+.rsp-top-logo-anchor {
+  pointer-events: none;
+  position: absolute;
+  top: var(--rsp-logo-inset-y);
+  right: var(--rsp-logo-inset-x);
+  z-index: 2;
+}
+
+.rsp-top-logo {
+  pointer-events: auto;
+  flex-shrink: 0;
 }
 
 .rsp-title {
@@ -70,6 +97,7 @@
 .rsp-buffer-overlay {
   position: absolute;
   inset: 0;
+  z-index: 12;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,26 +131,73 @@
   }
 }
 
-.rsp-center-overlay {
+/* Center: ±10s, play/pause, optional next */
+.rsp-center-seek-overlay {
   position: absolute;
   inset: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
 }
 
-.rsp-main-play-btn {
+.rsp-center-seek-pill {
   pointer-events: auto;
   display: inline-flex;
   align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
   justify-content: center;
+  max-width: calc(100% - 24px);
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(15, 23, 42, 0.8);
-  color: #fff;
-  padding: 14px 22px;
-  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(8px);
+  padding: 6px 10px;
+}
+
+.rsp-center-seek-pill .rsp-btn-ghost {
+  padding: 8px 12px;
+}
+
+.rsp-center-seek-pill .rsp-center-seek-play {
+  padding: 8px 14px;
+  border-radius: 999px;
+}
+
+.rsp-progress-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.rsp-scrub-preview {
+  pointer-events: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  z-index: 5;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+.rsp-scrub-preview-clip {
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.rsp-scrub-preview-img {
+  display: block;
+  max-width: none;
+}
+
+.rsp-scrub-preview-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 36px;
+  background: rgba(30, 41, 59, 0.92);
 }
 
 .rsp-progress {
@@ -132,6 +207,26 @@
   border-radius: 999px;
   appearance: none;
   -webkit-appearance: none;
+}
+
+.rsp-progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 2px solid #e2e8f0;
+  cursor: pointer;
+}
+
+.rsp-progress::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 2px solid #e2e8f0;
+  cursor: pointer;
 }
 
 .rsp-controls-row {
@@ -145,11 +240,7 @@
 }
 
 .rsp-left-controls,
-.rsp-right-controls,
-.rsp-logo-pill,
-.rsp-time-pill,
-.rsp-volume-group,
-.rsp-btn-chip {
+.rsp-right-controls {
   border: 1px solid rgba(255, 255, 255, 0.15);
   background: rgba(15, 23, 42, 0.9);
   backdrop-filter: blur(8px);
@@ -158,18 +249,18 @@
 .rsp-left-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   border-radius: 999px;
-  padding: 6px 8px;
+  padding: 4px 6px;
 }
 
 .rsp-right-controls {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   border-radius: 999px;
-  padding: 4px;
+  padding: 4px 6px;
 }
 
 .rsp-btn {
@@ -183,9 +274,12 @@
 }
 
 .rsp-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   border-radius: 999px;
-  padding: 6px 12px;
+  padding: 8px 10px;
 }
 
 .rsp-btn-primary {
@@ -197,11 +291,6 @@
 
 .rsp-btn-primary:hover {
   background: #60a5fa;
-}
-
-.rsp-btn-chip {
-  border-radius: 999px;
-  padding: 8px 12px;
 }
 
 .rsp-btn-icon-group {
@@ -254,24 +343,20 @@
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(8px);
 }
 
 .rsp-volume-group {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  border-radius: 999px;
-  padding: 8px 10px;
-}
-
-.rsp-icon-btn {
+  gap: 0;
   border: none;
-  border-radius: 999px;
   background: transparent;
-  color: #fff;
-  cursor: pointer;
-  display: inline-flex;
+  backdrop-filter: none;
+  padding: 0;
 }
 
 .rsp-volume-slider-popover {
@@ -302,8 +387,422 @@
 }
 
 .rsp-time-pill {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: transparent;
+  backdrop-filter: none;
   border-radius: 999px;
-  padding: 8px 12px;
+  padding: 8px 6px;
   font-variant-numeric: tabular-nums;
   color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .rsp-top-overlay,
+  .rsp-bottom-overlay {
+    padding: 12px;
+  }
+
+  .rsp-top-overlay {
+    --rsp-logo-inset-y: 12px;
+    --rsp-logo-inset-x: 12px;
+  }
+
+  .rsp-controls-row {
+    margin-top: 12px;
+    gap: 10px;
+  }
+
+  .rsp-left-controls,
+  .rsp-right-controls {
+    gap: 6px;
+  }
+
+  .rsp-btn-ghost,
+  .rsp-btn-primary,
+  .rsp-logo-pill {
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+
+  .rsp-settings-menu {
+    width: min(224px, calc(100vw - 32px));
+  }
+}
+
+@media (max-width: 640px) {
+  .rsp-root {
+    border-radius: 12px;
+  }
+
+  .rsp-top-overlay,
+  .rsp-bottom-overlay {
+    padding: 10px;
+  }
+
+  .rsp-top-overlay {
+    --rsp-logo-inset-y: 10px;
+    --rsp-logo-inset-x: 10px;
+  }
+
+  .rsp-title {
+    font-size: 13px;
+  }
+
+  .rsp-controls-row {
+    margin-top: 10px;
+    gap: 8px;
+    width: 100%;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .rsp-left-controls,
+  .rsp-right-controls {
+    width: auto;
+    flex: 0 1 auto;
+    min-width: 0;
+    border-radius: 999px;
+    flex-wrap: nowrap;
+  }
+
+  .rsp-left-controls {
+    justify-content: flex-start;
+  }
+
+  .rsp-right-controls {
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+
+  .rsp-btn-caption {
+    font-size: 11px;
+  }
+
+  .rsp-settings-menu {
+    right: 0;
+    left: auto;
+    transform: none;
+    width: min(280px, calc(100vw - 24px));
+  }
+
+  .rsp-time-pill {
+    min-width: 0;
+    text-align: center;
+  }
+}
+
+/* Narrow phones: same bar as desktop — left cluster flush start, right cluster flush end */
+@media (max-width: 500px) {
+  .rsp-bottom-overlay {
+    padding: 6px 4px 8px;
+    box-sizing: border-box;
+  }
+
+  .rsp-progress {
+    margin-bottom: 2px;
+    height: 4px;
+  }
+
+  .rsp-progress::-webkit-slider-thumb {
+    width: 11px;
+    height: 11px;
+    border-width: 1px;
+  }
+
+  .rsp-progress::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border-width: 1px;
+  }
+
+  .rsp-scrub-preview {
+    bottom: calc(100% + 4px);
+  }
+
+  .rsp-controls-row {
+    margin-top: 6px;
+    width: 100%;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    overflow-x: visible;
+    overflow-y: visible;
+    padding-bottom: 0;
+  }
+
+  .rsp-left-controls,
+  .rsp-right-controls {
+    width: auto;
+    flex: 0 1 auto;
+    min-width: 0;
+    flex-wrap: nowrap;
+    border-radius: 999px;
+    padding: 4px 6px;
+  }
+
+  .rsp-left-controls {
+    justify-content: flex-start;
+  }
+
+  .rsp-right-controls {
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+
+  .rsp-btn-ghost {
+    padding: 5px 8px;
+  }
+
+  .rsp-btn-primary {
+    padding: 6px 11px;
+  }
+
+  .rsp-logo-pill {
+    padding: 5px 8px;
+  }
+
+  .rsp-time-pill {
+    min-width: 0;
+    padding: 6px 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .rsp-settings-menu {
+    right: 0;
+    left: auto;
+    transform: none;
+    width: min(260px, calc(100vw - 16px));
+  }
+
+  .rsp-relative {
+    flex-shrink: 0;
+  }
+
+  .rsp-center-seek-pill {
+    border: none;
+    padding: 4px 8px;
+    gap: 4px;
+  }
+
+  .rsp-center-seek-pill .rsp-center-seek-play {
+    padding: 5px 10px;
+  }
+}
+
+@media (max-width: 420px) {
+  .rsp-root {
+    border-radius: 10px;
+    border: none;
+    box-shadow: none;
+  }
+
+  .rsp-left-controls,
+  .rsp-right-controls {
+    border: none;
+  }
+
+  .rsp-center-seek-pill {
+    border: none;
+  }
+
+  .rsp-top-overlay .rsp-logo-pill {
+    border: none;
+    box-shadow: none;
+  }
+
+  .rsp-top-overlay,
+  .rsp-bottom-overlay {
+    padding: 8px;
+  }
+
+  .rsp-top-overlay {
+    --rsp-logo-inset-y: 8px;
+    --rsp-logo-inset-x: 8px;
+  }
+
+  .rsp-controls-row {
+    margin-top: 8px;
+    gap: 6px;
+  }
+
+  .rsp-left-controls,
+  .rsp-right-controls {
+    padding: 4px 6px;
+  }
+
+  .rsp-btn-ghost {
+    padding: 6px 10px;
+  }
+
+  .rsp-btn-primary {
+    padding: 7px 12px;
+  }
+
+  .rsp-logo-pill {
+    padding: 7px 10px;
+  }
+
+  .rsp-time-pill {
+    padding: 6px 4px;
+    font-size: 11px;
+  }
+
+  .rsp-buffer-chip {
+    gap: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .rsp-settings-menu {
+    right: 0;
+    left: auto;
+    transform: none;
+    width: calc(100vw - 20px);
+  }
+}
+
+@media (max-width: 400px) {
+  /* Frame: drop heavy chrome on small phones */
+  .rsp-root {
+    border: none;
+    box-shadow: none;
+    border-radius: 8px;
+  }
+
+  .rsp-top-overlay {
+    padding: 6px 8px 18px;
+    --rsp-logo-inset-y: 6px;
+    --rsp-logo-inset-x: 8px;
+  }
+
+  .rsp-title {
+    font-size: 12px;
+    line-height: 1.25;
+    max-width: 100%;
+  }
+
+  .rsp-top-overlay--has-logo .rsp-title {
+    max-width: calc(100% - 96px);
+  }
+
+  .rsp-bottom-overlay {
+    padding: 4px 4px 6px;
+  }
+
+  .rsp-progress {
+    height: 3px;
+    margin-bottom: 0;
+  }
+
+  .rsp-progress::-webkit-slider-thumb {
+    width: 8px;
+    height: 8px;
+    border-width: 1px;
+  }
+
+  .rsp-progress::-moz-range-thumb {
+    width: 8px;
+    height: 8px;
+    border-width: 1px;
+  }
+
+  .rsp-scrub-preview {
+    bottom: calc(100% + 3px);
+  }
+
+  .rsp-controls-row {
+    margin-top: 4px;
+    gap: 4px;
+  }
+
+  /* One flat bar per side — no nested “ring inside ring” */
+  .rsp-left-controls,
+  .rsp-right-controls {
+    border: none;
+    background: rgba(15, 23, 42, 0.94);
+    padding: 2px 3px;
+    gap: 2px;
+    border-radius: 10px;
+  }
+
+  .rsp-bottom-overlay .rsp-btn-ghost,
+  .rsp-bottom-overlay .rsp-btn-primary {
+    border-radius: 8px;
+    padding: 4px 6px;
+  }
+
+  .rsp-bottom-overlay .rsp-btn svg,
+  .rsp-top-overlay .rsp-logo-pill svg,
+  .rsp-top-overlay .rsp-top-logo svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Center cluster: no pill border, play same scale as ±10 */
+  .rsp-center-seek-pill {
+    border: none;
+    background: rgba(15, 23, 42, 0.92);
+    padding: 2px 4px;
+    gap: 2px;
+    max-width: calc(100% - 8px);
+    border-radius: 10px;
+  }
+
+  .rsp-center-seek-pill svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .rsp-center-seek-pill .rsp-center-seek-play svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .rsp-btn-caption {
+    font-size: 9px;
+  }
+
+  .rsp-center-seek-pill .rsp-btn-ghost {
+    padding: 4px 6px;
+    border-radius: 8px;
+  }
+
+  .rsp-center-seek-pill .rsp-center-seek-play {
+    padding: 4px 8px;
+    border-radius: 8px;
+  }
+
+  .rsp-bottom-overlay .rsp-time-pill {
+    padding: 4px 2px;
+    font-size: 10px;
+  }
+
+  .rsp-top-overlay .rsp-logo-pill {
+    padding: 3px 6px;
+    font-size: 10px;
+    border-radius: 8px;
+    border: none;
+    box-shadow: none;
+  }
+
+  .rsp-spinner {
+    width: 12px;
+    height: 12px;
+    border-width: 1.5px;
+  }
+
+  .rsp-buffer-chip {
+    gap: 6px;
+    padding: 5px 10px;
+    font-size: 11px;
+  }
 }

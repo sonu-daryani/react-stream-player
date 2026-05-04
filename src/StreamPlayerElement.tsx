@@ -16,7 +16,16 @@ const toStreamType = (value: string | null): StreamType => {
 
 class StreamPlayerElement extends HTMLElement {
   static get observedAttributes() {
-    return ["title", "stream-url", "stream-type", "poster-src", "embed", "class-name"];
+    return [
+      "title",
+      "stream-url",
+      "stream-type",
+      "poster-src",
+      "seek-thumbnail",
+      "preview-storyboard-vtt-url",
+      "embed",
+      "class-name",
+    ];
   }
 
   private root: Root | null = null;
@@ -51,6 +60,9 @@ class StreamPlayerElement extends HTMLElement {
     const streamUrl = this.getAttribute("stream-url") || "";
     const posterSrc = this.getAttribute("poster-src") || "";
     const streamType = toStreamType(this.getAttribute("stream-type"));
+    const seekThumbnail = this.getAttribute("seek-thumbnail")?.trim() || undefined;
+    const previewStoryboardVttUrl =
+      this.getAttribute("preview-storyboard-vtt-url")?.trim() || undefined;
     const embed = this.getAttribute("embed") !== null && this.getAttribute("embed") !== "false";
     const className = this.getAttribute("class-name") || undefined;
 
@@ -60,6 +72,8 @@ class StreamPlayerElement extends HTMLElement {
         streamUrl,
         streamType,
         posterSrc,
+        seekThumbnail,
+        previewStoryboardVttUrl,
         embed,
         className,
         onNext: () => {

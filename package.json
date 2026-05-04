@@ -1,11 +1,12 @@
 {
   "name": "hls-react-player",
-  "version": "0.3.1",
-  "description": "Reusable StreamFlix custom React player component",
+  "version": "0.5.0",
+  "description": "React video player for MP4, HLS, and DASH",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "style": "dist/index.css",
+  "sideEffects": ["**/*.css"],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -14,9 +15,7 @@
     },
     "./styles.css": "./dist/index.css"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

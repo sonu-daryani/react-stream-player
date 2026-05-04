@@ -1,6 +1,8 @@
 # hls-react-player
 
-Reusable React video player component extracted from the StreamFlix app. Supports **MP4**, **HLS (m3u8)**, and **DASH (mpd)** streams with a modern UI and customizable controls.
+Reusable React video player (MP4, HLS, DASH) with a StreamFlix-style control layer.
+
+**Package name on npm:** `hls-react-player` (publish from this directory with `npm publish` after `npm run build`). Until it is published, use an npm workspace or `npm link` instead of committing `.tgz` files.
 
 ---
 
@@ -20,20 +22,38 @@ Reusable React video player component extracted from the StreamFlix app. Support
 ## 📦 Install
 
 ```bash
-npm install hls-react-player
+npm install hls-react-player react react-dom
+```
+
+**Peer dependencies:** `react` and `react-dom` **18+** (your app supplies them; the package does not ship a separate React runtime).
+
+**Bundled inside the package:** `hls.js`, `dashjs`, and `lucide-react` (icons). You do **not** install those separately for normal use.
+
+**Styles:** import the stylesheet once (root layout or app entry):
+
+```ts
+import "hls-react-player/styles.css";
 ```
 
 ---
 
-## 🔗 Dependencies
+## 🔗 Vite demo (this repo)
 
-No extra installs are required. `hls-react-player` bundles everything it needs, including React runtime, icons, and stream engines.
+From the repository root:
+
+```bash
+npm run demo:install
+npm run demo:dev
+```
+
+The demo under `demo/` resolves the parent package via `file:..` in `demo/package.json` so you can run it before publishing. See [`demo/README.md`](demo/README.md).
 
 ---
 
 ## 🚀 Usage
 
 ```tsx
+import "hls-react-player/styles.css";
 import { StreamPlayer } from "hls-react-player";
 import type { StreamType } from "hls-react-player";
 
@@ -51,13 +71,16 @@ export default function App() {
 }
 ```
 
+Optional: pass **`seekThumbnail`** with an absolute WebVTT URL (sprite `#xywh=` cues) to enable scrub-bar thumbnail previews.
+
 ---
 
 ## 🌐 Plain HTML + JavaScript Usage
 
-You can use this package without React components by registering a custom element:
+You can use this package without React components by registering a custom element. Import the stylesheet once (same as React usage):
 
 ```js
+import "hls-react-player/styles.css";
 import { registerStreamPlayerElement } from "hls-react-player";
 
 registerStreamPlayerElement(); // registers <stream-player>
@@ -69,8 +92,11 @@ registerStreamPlayerElement(); // registers <stream-player>
   stream-url="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
   stream-type="hls"
   poster-src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=80"
+  seek-thumbnail="https://example.com/storyboard.vtt"
 ></stream-player>
 ```
+
+(`seek-thumbnail` is optional; use a WebVTT URL whose cues reference a sprite sheet, same as the React `seekThumbnail` prop.)
 
 Listen to next episode clicks:
 
@@ -129,13 +155,15 @@ player?.addEventListener("next", () => {
 | `title`         | `string`                  | **required** | Title displayed at the top of the player         |
 | `streamUrl`     | `string`                  | **required** | Video/stream source URL                          |
 | `streamType`    | `"mp4" \| "hls" \| "mpd"` | **required** | Streaming format                                 |
-| `posterSrc`     | `string`                  | `undefined`  | Poster image                                     |
+| `posterSrc`     | `string`                  | **required** | Poster image                                     |
+| `seekThumbnail` | `string` or `SeekThumbnailGridSheet[]` | — | Hover scrub: `.vtt` URL, or a small array of sprite sheets (see `SeekThumbnailGridSheet` export). |
+| `previewStoryboardVttUrl` | `string` | — | Old name for the vtt-only case; use `seekThumbnail` string instead. |
 | `onNext`        | `() => void`              | `undefined`  | Triggered when "Next" button is clicked          |
 | `embed`         | `boolean`                 | `false`      | Enables embed mode (minimal UI wrapper)          |
 | `className`     | `string`                  | `undefined`  | Custom root class                                |
 | `style`         | `React.CSSProperties`     | `undefined`  | Inline styles for root                           |
-| `showLogo`      | `boolean`                 | `true`       | Show or hide the branding pill                   |
-| `customLogo`    | `ReactNode`               | `undefined`  | Render custom logo/content inside branding pill  |
+| `showLogo`      | `boolean`                 | `false`      | When `true` **and** `customLogo` is set, shows branding in the **top-right** (never in the bottom bar) |
+| `customLogo`    | `ReactNode`               | `undefined`  | Logo / mark rendered in the top-right pill when `showLogo` is `true` |
 | `classNames`    | `StreamPlayerClassNames`  | `{}`         | Replace internal className slots                 |
 | `customStyling` | `StreamPlayerCustomStyling` | `{}`       | Inline style overrides for internal UI sections  |
 
@@ -145,7 +173,11 @@ player?.addEventListener("next", () => {
 
 Override internal UI parts without writing external CSS:
 
-Built-in default player CSS is injected automatically by the package. You do not need to import any stylesheet manually for the default UI.
+Import the bundled stylesheet once in your app (for example in your root layout or entry file):
+
+```ts
+import "hls-react-player/styles.css";
+```
 
 ```tsx
 <StreamPlayer
@@ -175,6 +207,7 @@ Built-in default player CSS is injected automatically by the package. You do not
   title="Custom Branding"
   streamUrl="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
   streamType="hls"
+  showLogo
   customLogo={<span>MyOTT</span>}
 />
 ```
@@ -235,11 +268,29 @@ Use for iframe/widget embedding:
 
 ---
 
-## 🛠 Development
+## 🛠 Development & publishing (maintainers)
+
+Clone this repo to change the player source; end users normally only install from npm.
 
 ```bash
 npm install
-npm run build
+npm run build   # outputs to dist/ (published via package.json "files")
 ```
+
+**Release checklist**
+
+1. Bump `"version"` in [`package.json`](package.json).
+2. `npm run build`
+3. `npm publish` (npm login required; package name `hls-react-player`).
+
+After publish, apps upgrade with `npm install hls-react-player@latest`.
+
+---
+
+## Maintainer & related projects
+
+- **GitHub:** [@sonu-daryani](https://github.com/sonu-daryani)
+- **npm:** `hls-react-player` (publish when ready; link appears on npmjs after the first release)
+- **StreamFlix (sample app):** [`../netflix-streaming-platform/README.md`](../netflix-streaming-platform/README.md) — Next.js + MongoDB, consumes this package from the registry, optional MX-style catalog seed (`npm run seed:mx`) and legal notes in that README.
 
 ---

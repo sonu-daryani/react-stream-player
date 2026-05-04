@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Clapperboard,
   Maximize,
   Minimize,
   Pause,
@@ -14,9 +13,14 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
-import type { StreamPlayerClassNames, StreamPlayerProps } from "./types";
+import type { SeekThumbnailGridSheet, StreamPlayerClassNames, StreamPlayerProps } from "./types";
+import {
+  parseThumbnailStoryboardVtt,
+  pickThumbnailCueForTime,
+  type ThumbnailCue,
+} from "./storyboardVtt";
+import { pickGridThumbAtTime } from "./seekThumbnailGrid";
 import "./stream-player.css";
-import { ensureStreamPlayerStyles } from "./ensureStyles";
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(" ");
 
@@ -49,6 +53,8 @@ export default function StreamPlayer({
   streamUrl,
   streamType,
   posterSrc,
+  seekThumbnail,
+  previewStoryboardVttUrl,
   onNext,
   embed = false,
   className,
@@ -85,10 +91,17 @@ export default function StreamPlayer({
   const [selectedSubtitle, setSelectedSubtitle] = useState("Off");
   const [selectedAudio, setSelectedAudio] = useState("Default");
   const [selectedResolution, setSelectedResolution] = useState("Auto");
-
-  useEffect(() => {
-    ensureStreamPlayerStyles();
-  }, []);
+  const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
+  const [spriteDims, setSpriteDims] = useState<{ w: number; h: number } | null>(null);
+  type ScrubCue = Pick<ThumbnailCue, "url" | "x" | "y" | "w" | "h">;
+  const [scrubPreview, setScrubPreview] = useState<null | {
+    pct: number;
+    cue: ScrubCue;
+    scale: number;
+    dispW: number;
+    dispH: number;
+  }>(null);
+  const progressWrapRef = useRef<HTMLDivElement | null>(null);
 
   const safePlay = async (video: HTMLVideoElement) => {
     try {
@@ -258,13 +271,13 @@ export default function StreamPlayer({
 
   const revealControls = useCallback(() => {
     setAreControlsVisible(true);
-    if (isFullscreen && isPlaying) {
+    if (isPlaying) {
       scheduleControlsHide();
     }
-  }, [isFullscreen, isPlaying, scheduleControlsHide]);
+  }, [isPlaying, scheduleControlsHide]);
 
   useEffect(() => {
-    if (isFullscreen && isPlaying) {
+    if (isPlaying) {
       setAreControlsVisible(true);
       scheduleControlsHide();
       return;
@@ -272,7 +285,7 @@ export default function StreamPlayer({
 
     clearControlsHideTimer();
     setAreControlsVisible(true);
-  }, [clearControlsHideTimer, isFullscreen, isPlaying, scheduleControlsHide]);
+  }, [clearControlsHideTimer, isPlaying, scheduleControlsHide]);
 
   useEffect(() => {
     return () => {
@@ -294,6 +307,113 @@ export default function StreamPlayer({
     if (!duration) return 0;
     return (currentTime / duration) * 100;
   }, [currentTime, duration]);
+
+  const gridSpriteSheets = useMemo(() => {
+    if (!Array.isArray(seekThumbnail) || !seekThumbnail.length) return null;
+    const head = seekThumbnail[0];
+    if (
+      head &&
+      typeof head === "object" &&
+      typeof (head as SeekThumbnailGridSheet).spriteUrl === "string"
+    ) {
+      return seekThumbnail as SeekThumbnailGridSheet[];
+    }
+    return null;
+  }, [seekThumbnail]);
+
+  const updateScrubPreviewFromClientX = useCallback(
+    (clientX: number) => {
+      const wrap = progressWrapRef.current;
+      if (!wrap || duration <= 0) {
+        setScrubPreview(null);
+        return;
+      }
+      const rect = wrap.getBoundingClientRect();
+      const pct01 = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+      const t = pct01 * duration;
+      const small =
+        typeof window !== "undefined" && window.matchMedia?.("(max-width: 500px)")?.matches;
+      const cap = small ? 68 : 116;
+
+      const pushPreview = (cue: ScrubCue) => {
+        const scale = Math.min(1, cap / Math.max(cue.w, 1));
+        setScrubPreview({
+          pct: pct01 * 100,
+          cue,
+          scale,
+          dispW: cue.w * scale,
+          dispH: cue.h * scale,
+        });
+      };
+
+      if (gridSpriteSheets?.length) {
+        const frame = pickGridThumbAtTime(gridSpriteSheets[0], t);
+        if (!frame) {
+          setScrubPreview(null);
+          return;
+        }
+        pushPreview(frame);
+        return;
+      }
+
+      if (!thumbnailCues.length) {
+        setScrubPreview(null);
+        return;
+      }
+      const cue = pickThumbnailCueForTime(thumbnailCues, t);
+      if (!cue) {
+        setScrubPreview(null);
+        return;
+      }
+      pushPreview({ url: cue.url, x: cue.x, y: cue.y, w: cue.w, h: cue.h });
+    },
+    [duration, gridSpriteSheets, thumbnailCues],
+  );
+
+  const storyboardVttUrl = useMemo(() => {
+    if (gridSpriteSheets) return undefined;
+    const fromSeek = typeof seekThumbnail === "string" ? seekThumbnail.trim() : "";
+    const fromLegacy = previewStoryboardVttUrl?.trim();
+    const u = (fromSeek && fromSeek.length > 0 ? fromSeek : fromLegacy) || undefined;
+    return u;
+  }, [gridSpriteSheets, seekThumbnail, previewStoryboardVttUrl]);
+
+  useEffect(() => {
+    const url = storyboardVttUrl;
+    if (!url) {
+      setThumbnailCues([]);
+      return;
+    }
+    const ac = new AbortController();
+    void (async () => {
+      try {
+        const res = await fetch(url, { signal: ac.signal, mode: "cors" });
+        if (!res.ok) return;
+        const text = await res.text();
+        setThumbnailCues(parseThumbnailStoryboardVtt(text, url));
+      } catch {
+        setThumbnailCues([]);
+      }
+    })();
+    return () => ac.abort();
+  }, [storyboardVttUrl]);
+
+  useEffect(() => {
+    const url = scrubPreview?.cue.url;
+    if (!url) {
+      setSpriteDims(null);
+      return;
+    }
+    setSpriteDims(null);
+    const img = new Image();
+    img.onload = () => {
+      if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+        setSpriteDims({ w: img.naturalWidth, h: img.naturalHeight });
+      }
+    };
+    img.onerror = () => setSpriteDims({ w: 0, h: 0 });
+    img.src = url;
+  }, [scrubPreview?.cue.url]);
 
   const togglePlay = useCallback(async () => {
     const video = videoRef.current;
@@ -515,14 +635,20 @@ export default function StreamPlayer({
             ui.topOverlay,
             "rsp-fade-overlay",
             areControlsVisible ? "rsp-visible" : "rsp-hidden",
+            showLogo && customLogo ? "rsp-top-overlay--has-logo" : null,
           )}
           style={customStyling?.topOverlay}
         >
           <div className="rsp-top-inner">
-            <div>
-              <p className="rsp-title">{title}</p>
-            </div>
+            <p className="rsp-title">{title}</p>
           </div>
+          {showLogo && customLogo ? (
+            <div className="rsp-top-logo-anchor">
+              <span className={cx(ui.logoPill, "rsp-top-logo")} style={customStyling?.logoPill}>
+                {customLogo}
+              </span>
+            </div>
+          ) : null}
         </div>
 
         {isBuffering ? (
@@ -534,16 +660,56 @@ export default function StreamPlayer({
           </div>
         ) : null}
 
-        {!isPlaying && !isBuffering ? (
-          <div className="rsp-center-overlay">
-            <button
-              type="button"
-              onClick={togglePlay}
-              className="rsp-main-play-btn"
-              aria-label="Play"
-            >
-              <Play size={24} />
-            </button>
+        {!isBuffering ? (
+          <div
+            className={cx(
+              "rsp-center-seek-overlay",
+              "rsp-fade-overlay",
+              areControlsVisible ? "rsp-visible" : "rsp-hidden",
+            )}
+          >
+            <div className="rsp-center-seek-pill">
+              <button
+                type="button"
+                onClick={() => seekBy(-10)}
+                className="rsp-btn rsp-btn-ghost"
+                aria-label="Back 10 seconds"
+              >
+                <span className="rsp-btn-icon-group">
+                  <RotateCcw size={18} />
+                  <span className="rsp-btn-caption">10</span>
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => void togglePlay()}
+                className="rsp-btn rsp-btn-primary rsp-center-seek-play"
+                aria-label={isPlaying ? "Pause" : "Play"}
+              >
+                {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+              </button>
+              <button
+                type="button"
+                onClick={() => seekBy(10)}
+                className="rsp-btn rsp-btn-ghost"
+                aria-label="Forward 10 seconds"
+              >
+                <span className="rsp-btn-icon-group">
+                  <span className="rsp-btn-caption">10</span>
+                  <RotateCw size={18} />
+                </span>
+              </button>
+              {onNext ? (
+                <button
+                  type="button"
+                  onClick={onNext}
+                  className="rsp-btn rsp-btn-ghost"
+                  aria-label="Next episode"
+                >
+                  <SkipForward size={18} />
+                </button>
+              ) : null}
+            </div>
           </div>
         ) : null}
 
@@ -555,62 +721,120 @@ export default function StreamPlayer({
           )}
           style={customStyling?.bottomOverlay}
         >
-          <input
-            type="range"
-            min={0}
-            max={duration || 0}
-            step={0.1}
-            value={currentTime}
-            onChange={handleSeek}
-            className="rsp-progress"
-            style={{
-              ...customStyling?.progress,
-              background: `linear-gradient(to right, #3b82f6 ${progress}%, #334155 ${progress}%)`,
+          <div
+            ref={progressWrapRef}
+            className="rsp-progress-wrap"
+            onPointerLeave={() => setScrubPreview(null)}
+            onPointerMove={(event) => {
+              if (event.pointerType === "mouse" || event.pointerType === "pen") {
+                revealControls();
+                updateScrubPreviewFromClientX(event.clientX);
+              }
             }}
-          />
+            onTouchStart={(event) => {
+              revealControls();
+              const x = event.touches[0]?.clientX;
+              if (x !== undefined) updateScrubPreviewFromClientX(x);
+            }}
+            onTouchMove={(event) => {
+              const x = event.touches[0]?.clientX;
+              if (x !== undefined) updateScrubPreviewFromClientX(x);
+            }}
+            onTouchEnd={() => setScrubPreview(null)}
+          >
+            {scrubPreview && duration > 0 ? (
+              <div
+                className="rsp-scrub-preview"
+                style={{
+                  left: `${scrubPreview.pct}%`,
+                  width: scrubPreview.dispW,
+                  height: scrubPreview.dispH,
+                }}
+              >
+                {spriteDims && spriteDims.w > 0 ? (
+                  <div
+                    className="rsp-scrub-preview-clip"
+                    style={{
+                      width: scrubPreview.dispW,
+                      height: scrubPreview.dispH,
+                    }}
+                  >
+                    <img
+                      src={scrubPreview.cue.url}
+                      alt=""
+                      draggable={false}
+                      className="rsp-scrub-preview-img"
+                      style={{
+                        width: spriteDims.w * scrubPreview.scale,
+                        height: spriteDims.h * scrubPreview.scale,
+                        marginLeft: -scrubPreview.cue.x * scrubPreview.scale,
+                        marginTop: -scrubPreview.cue.y * scrubPreview.scale,
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="rsp-scrub-preview-placeholder" />
+                )}
+              </div>
+            ) : null}
+            <input
+              type="range"
+              min={0}
+              max={duration || 0}
+              step={0.1}
+              value={currentTime}
+              onChange={handleSeek}
+              onInput={(event) => {
+                revealControls();
+                const el = event.currentTarget;
+                const rect = el.getBoundingClientRect();
+                const max = Number(el.max) || 1;
+                const pct = Math.min(1, Math.max(0, Number(el.value) / max));
+                updateScrubPreviewFromClientX(rect.left + pct * rect.width);
+              }}
+              className="rsp-progress"
+              style={{
+                ...customStyling?.progress,
+                background: `linear-gradient(to right, #3b82f6 ${progress}%, #334155 ${progress}%)`,
+              }}
+            />
+          </div>
 
           <div className="rsp-controls-row">
             <div className={ui.leftControls} style={customStyling?.leftControls}>
               <button
                 type="button"
-                onClick={() => seekBy(-10)}
-                className="rsp-btn rsp-btn-ghost"
-                aria-label="Back 10 seconds"
-              >
-                <span className="rsp-btn-icon-group">
-                  <RotateCcw size={16} />
-                  <span className="rsp-btn-caption">10</span>
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={togglePlay}
+                onClick={() => void togglePlay()}
                 className="rsp-btn rsp-btn-primary"
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
                 {isPlaying ? <Pause size={18} /> : <Play size={18} />}
               </button>
-              <button
-                type="button"
-                onClick={() => seekBy(10)}
-                className="rsp-btn rsp-btn-ghost"
-                aria-label="Forward 10 seconds"
-              >
-                <span className="rsp-btn-icon-group">
-                  <span className="rsp-btn-caption">10</span>
-                  <RotateCw size={16} />
-                </span>
-              </button>
-              {onNext ? (
+              <div className="rsp-volume-group">
                 <button
                   type="button"
-                  onClick={onNext}
+                  onClick={toggleMute}
                   className="rsp-btn rsp-btn-ghost"
-                  aria-label="Next episode"
+                  aria-label={isMuted ? "Unmute" : "Mute"}
                 >
-                  <SkipForward size={16} />
+                  {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
                 </button>
-              ) : null}
+                <div className="rsp-volume-slider-popover">
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    value={isMuted ? 0 : volume}
+                    onChange={handleVolume}
+                    className="rsp-volume-slider"
+                    style={{ writingMode: "vertical-lr", direction: "rtl" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={ui.rightControls} style={customStyling?.rightControls}>
               <div ref={settingsRef} className="rsp-relative">
                 <button
                   type="button"
@@ -618,7 +842,7 @@ export default function StreamPlayer({
                   className="rsp-btn rsp-btn-ghost"
                   aria-label="Player settings"
                 >
-                  <Settings size={16} />
+                  <Settings size={18} />
                 </button>
                 {isSettingsOpen ? (
                   <div className="rsp-settings-menu">
@@ -667,50 +891,16 @@ export default function StreamPlayer({
                   </div>
                 ) : null}
               </div>
-            </div>
-
-            <div className={ui.rightControls} style={customStyling?.rightControls}>
-              {showLogo && customLogo ? (
-                <span className={ui.logoPill} style={customStyling?.logoPill}>
-                  {customLogo}
-                </span>
-              ) : showLogo ? (
-                <span className={ui.logoPill} style={customStyling?.logoPill}>
-                  <Clapperboard size={14} />
-                </span>
-              ) : null}
-              <div className="rsp-volume-group">
-                <button
-                  type="button"
-                  onClick={toggleMute}
-                  className="rsp-icon-btn"
-                  aria-label={isMuted ? "Unmute" : "Mute"}
-                >
-                  {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-                </button>
-                <div className="rsp-volume-slider-popover">
-                  <input
-                    type="range"
-                    min={0}
-                    max={1}
-                    step={0.05}
-                    value={isMuted ? 0 : volume}
-                    onChange={handleVolume}
-                    className="rsp-volume-slider"
-                    style={{ writingMode: "vertical-lr", direction: "rtl" }}
-                  />
-                </div>
-              </div>
               <span className={ui.timePill} style={customStyling?.timePill}>
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
               <button
                 type="button"
                 onClick={toggleFullscreen}
-                className="rsp-btn rsp-btn-chip"
+                className="rsp-btn rsp-btn-ghost"
                 aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
               >
-                {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+                {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
               </button>
             </div>
           </div>

@@ -2,6 +2,16 @@ import type { CSSProperties, ReactNode } from "react";
 
 export type StreamType = "mp4" | "hls" | "mpd";
 
+export type SeekThumbnailGridSheet = {
+  total: number;
+  intervalSec: number;
+  thumbWidth: number;
+  thumbHeight: number;
+  columns: number;
+  rows: number;
+  spriteUrl: string;
+};
+
 export type StreamPlayerClassNames = {
   root: string;
   frame: string;
@@ -32,6 +42,8 @@ export type StreamPlayerProps = {
   streamUrl: string;
   streamType: StreamType;
   posterSrc: string;
+  seekThumbnail?: string | SeekThumbnailGridSheet[];
+  previewStoryboardVttUrl?: string;
   onNext?: () => void;
   embed?: boolean;
   className?: string;
